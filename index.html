@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>单词卡片 · 分级背单词</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="app-container">
+    <!-- 标题 -->
+    <header>
+        <h1>📖 单词卡片</h1>
+    </header>
+
+    <!-- 卡片区域 -->
+    <div class="card-container">
+        <div class="card">
+            <!-- 正面 -->
+            <div class="card-front">
+                <div class="card-word" id="cardWord"></div>
+                <div class="card-phonetic" id="cardPhonetic"></div>
+                <div class="card-example" id="cardExample"></div>
+            </div>
+            <!-- 反面 -->
+            <div class="card-back">
+                <div class="card-meaning" id="cardMeaning"></div>
+                <div class="card-example-translation" id="cardExampleTranslation"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 切换按钮组 -->
+    <div class="nav-buttons">
+        <button id="prevBtn" class="nav-btn">◀ 上一个</button>
+        <button id="nextBtn" class="nav-btn">下一个 ▶</button>
+    </div>
+
+    <!-- 等级标记按钮组 -->
+    <div class="level-buttons">
+        <button class="level-btn unfamiliar">不认识</button>
+        <button class="level-btn somewhat">不太熟</button>
+        <button class="level-btn familiar">认识</button>
+        <button class="level-btn mastered">完全熟</button>
+    </div>
+
+    <!-- 词库筛选栏 -->
+    <div class="filter-bar">
+        <span>词库筛选：</span>
+        <button class="filter-btn active" data-filter="unfamiliar">不认识</button>
+        <button class="filter-btn" data-filter="somewhat">不太熟</button>
+        <button class="filter-btn" data-filter="familiar">认识</button>
+        <button class="filter-btn" data-filter="mastered">完全熟</button>
+        <button class="filter-btn" data-filter="overall">总体记忆</button>
+    </div>
+
+    <!-- 剩余单词数 + 折叠按钮 -->
+    <div class="info-line">
+        <span>📊 剩余单词数：<span id="remainingCount">0</span></span>
+        <button id="toggleWordListBtn" class="toggle-list-btn">📋 查看单词列表</button>
+    </div>
+
+    <!-- 单词列表折叠面板 -->
+    <div id="wordListPanel" class="word-list-panel" style="display: none;">
+        <div class="word-list-header">当前词库单词列表</div>
+        <div id="wordListContainer" class="word-list-container"></div>
+    </div>
+
+    <!-- 配比调整区域（仅在总体记忆时显示） -->
+    <div id="ratioArea" class="ratio-area" style="display: none;">
+        <div class="ratio-title">📐 复习配比（不认识 : 不太熟 : 认识）</div>
+        <div class="ratio-inputs">
+            <label>不认识: <input type="number" id="ratioUnfamiliar" value="5" min="0" step="1"></label>
+            <label>不太熟: <input type="number" id="ratioSomewhat" value="3" min="0" step="1"></label>
+            <label>认识: <input type="number" id="ratioFamiliar" value="2" min="0" step="1"></label>
+        </div>
+        <div class="ratio-note">* 权重总和不必为10，程序会按比例随机抽取</div>
+    </div>
+
+    <!-- 学习统计区域 -->
+    <div class="stats-area">
+        <div class="stats-title">📈 学习统计</div>
+        <div class="stats-grid">
+            <div>不认识: <span id="statUnfamiliar">0</span></div>
+            <div>不太熟: <span id="statSomewhat">0</span></div>
+            <div>认识: <span id="statFamiliar">0</span></div>
+            <div>完全熟: <span id="statMastered">0</span></div>
+        </div>
+    </div>
+
+    <!-- 导入区域 -->
+    <div class="import-area">
+        <label for="importFile" class="import-label">📂 导入单词本 (JSON)</label>
+        <input type="file" id="importFile" accept=".json">
+        <div class="import-hint">注意：导入将替换当前所有单词，原数据会丢失。</div>
+    </div>
+</div>
+
+<!-- JavaScript 文件（按顺序引入） -->
+<script src="js/data.js"></script>
+<script src="js/review.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/import.js"></script>
+<script src="js/script.js"></script>
+<!-- 其他 JS 文件暂时注释，后续阶段再添加 -->
+<!-- <script src="js/storage.js"></script> -->
+<!-- <script src="js/review.js"></script> -->
+<!-- <script src="js/import.js"></script> -->
+</body>
+</html>

@@ -1,0 +1,15 @@
+[
+  {
+    "word": "hello",
+    "meaning": "你好",
+    "phonetic": "/həˈləʊ/",
+    "example": "Hello, world!",
+    "exampleTranslation": "你好，世界！"
+  },
+  {
+    "word": "world",
+    "meaning": "世界",
+    "example": "Hello, world!",
+    "exampleTranslation": "你好，世界！"
+  }
+]
