@@ -3,60 +3,85 @@
  */
 
 /**
- * 验证单词数据格式
- * @param {Array} data - 待验证的数据
- * @returns {boolean} 是否有效
+ * 导入 JSON 单词本
+ * @param {File} file - 选择的 JSON 文件
+ * @param {Function} onSuccess - 导入成功回调
+ * @param {Function} onError - 导入失败回调
  */
-function isValidWordData(data) {
-    if (!Array.isArray(data) || data.length === 0) return false;
-    // 检查每个单词是否包含必要字段
-    for (let item of data) {
-        if (!item.word || !item.meaning) return false;
-        // 可选字段：id, phonetic, example, exampleTranslation, level
-        // 如果不含 id，我们会在导入时自动生成
-    }
-    return true;
-}
+function importWordBook(file, onSuccess, onError) {
+    const reader = new FileReader();
 
-/**
- * 规范化导入的单词数据（补充默认字段）
- * @param {Array} rawData - 原始导入数据
- * @returns {Array} 规范化后的单词数组
- */
-function normalizeWordData(rawData) {
-    return rawData.map((item, index) => ({
-        id: item.id || Date.now() + index,  // 如果没有 id，生成唯一 id
-        word: item.word,
-        meaning: item.meaning,
-        phonetic: item.phonetic || '',
-        example: item.example || '',
-        exampleTranslation: item.exampleTranslation || '',
-        level: 'unfamiliar'  // 所有新导入单词初始为“不认识”
-    }));
-}
+    reader.onload = function(e) {
+        try {
+            const importedWords = JSON.parse(e.target.result);
 
-/**
- * 导入单词本（通过文件选择）
- * @param {File} file - 用户选择的 JSON 文件
- * @returns {Promise<Array>} 解析后的单词数组
- */
-function importWordBook(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            try {
-                const rawData = JSON.parse(e.target.result);
-                if (!isValidWordData(rawData)) {
-                    reject(new Error('文件格式无效：必须包含 word 和 meaning 字段，且为数组'));
-                    return;
-                }
-                const normalized = normalizeWordData(rawData);
-                resolve(normalized);
-            } catch (err) {
-                reject(new Error('JSON 解析失败：' + err.message));
+            // 验证数据格式
+            if (!validateWords(importedWords)) {
+                throw new Error('单词数据格式不正确，请检查 JSON 结构');
             }
-        };
-        reader.onerror = () => reject(new Error('文件读取失败'));
-        reader.readAsText(file, 'UTF-8');
+
+            // 为每个单词生成唯一 id（如果原数据没有 id 或 id 冲突）
+            const wordsWithId = importedWords.map((word, index) => ({
+                ...word,
+                id: word.id || Date.now() + index,
+                level: word.level || 'unfamiliar'  // 默认等级为“不认识”
+            }));
+
+            // 替换全局单词数组
+            words = wordsWithId;
+
+            // 保存到 localStorage
+            saveWords(words);
+
+            // 重新初始化界面
+            updateWorkList();
+            updateStats();
+            updateRemainingCount();
+
+            // 执行成功回调
+            if (onSuccess) onSuccess(words.length);
+        } catch (error) {
+            console.error('导入失败:', error);
+            if (onError) onError(error.message);
+        }
+    };
+
+    reader.onerror = function() {
+        if (onError) onError('文件读取失败');
+    };
+
+    reader.readAsText(file, 'UTF-8');
+}
+
+/**
+ * 验证导入的单词数据格式
+ * @param {Array} words - 待验证的单词数组
+ * @returns {boolean}
+ */
+function validateWords(words) {
+    if (!Array.isArray(words) || words.length === 0) {
+        return false;
+    }
+
+    // 检查每个单词的必要字段
+    const requiredFields = ['word', 'meaning'];
+    return words.every(word => {
+        return requiredFields.every(field => word.hasOwnProperty(field));
     });
+}
+
+/**
+ * 导出当前单词本为 JSON 文件（扩展功能）
+ */
+function exportWordBook() {
+    const dataStr = JSON.stringify(words, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `wordbook_${new Date().toISOString().slice(0,19)}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 }

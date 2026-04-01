@@ -370,46 +370,23 @@ function bindEvents() {
     ratioFamiliar.addEventListener('input', updateRatio);
 
     // 导入单词本
-    const importFileInput = document.getElementById('importFile');
-    importFileInput.addEventListener('change', async (event) => {
-        const file = event.target.files[0];
+    const importFile = document.getElementById('importFile');
+    importFile.addEventListener('change', (e) => {
+        const file = e.target.files[0];
         if (!file) return;
 
-        try {
-            const importedWords = await importWordBook(file);
-            // 替换单词数据
-            words = importedWords;
-            // 保存到 localStorage
-            saveWords(words);
-
-            // 重置筛选为“不认识”，因为新单词都是不认识
-            currentFilter = 'unfamiliar';
-            // 更新筛选按钮样式
-            filterBtns.forEach(btn => {
-                if (btn.dataset.filter === currentFilter) {
-                    btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
-                }
-            });
-            // 隐藏配比区域（因为当前不在总体记忆）
-            document.getElementById('ratioArea').style.display = 'none';
-
-            // 重新生成工作列表
-            updateWorkList();
-            // 更新统计
-            updateStats();
-            // 更新剩余单词数
-            updateRemainingCount();
-
-            // 可选：显示成功提示
-            alert(`导入成功！共 ${importedWords.length} 个单词，全部放入“不认识”词库。`);
-        } catch (err) {
-            alert('导入失败：' + err.message);
-        } finally {
-            // 清空 file input，允许重复导入同一个文件
-            importFileInput.value = '';
-        }
+        importWordBook(
+            file,
+            (count) => {
+                alert(`✅ 导入成功！共导入 ${count} 个单词。`);
+                // 清空文件选择，以便再次导入同一个文件时能触发 change 事件
+                importFile.value = '';
+            },
+            (error) => {
+                alert(`❌ 导入失败：${error}`);
+                importFile.value = '';
+            }
+        );
     });
 }
 
