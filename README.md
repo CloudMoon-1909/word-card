@@ -41,7 +41,7 @@
 
 ### 本地运行
 ```bash
-git clone https://github.com/你的用户名/word-card.git
+git clone https://github.com/CloudMoon-1909/word-card.git
 cd word-card
 # 直接用浏览器打开 index.html
 ```
