@@ -70,7 +70,6 @@ cd word-card
    ```json
    [
      {
-       "id": 1,
        "word": "example",
        "phonetic": "/ɪɡˈzæm.pəl/",
        "meaning": "例子",
